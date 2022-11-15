@@ -1,14 +1,18 @@
 const taskContainerElement: HTMLElement = document.querySelector(".tasks");
 const taskNameInputElement: HTMLInputElement = document.querySelector("#name");
 const addButtonElement: HTMLButtonElement = document.querySelector("button");
+const categoriesContainerElement: HTMLElement =
+  document.querySelector(".categories");
+let selectedCategory: Category;
 
+type Category = "general" | "gym" | "hobbie" | "work";
 interface Task {
   name: string;
   done: boolean;
-  category?: "general" | "gym" | "hobbie" | "work";
+  category?: Category;
 }
 
-const categories: string[] = ["general", "work", "gym", "hobby"];
+const categories: Category[] = ["general", "work", "gym", "hobby"];
 
 const tasks: Task[] = [
   {
@@ -58,15 +62,44 @@ const render = () => {
   });
 };
 
+const renderCategories = () => {
+  categories.forEach((category) => {
+    const categoryElement: HTMLElement = document.createElement("li");
+
+    const radioInputElement: HTMLInputElement = document.createElement("input");
+    radioInputElement.type = "radio";
+    radioInputElement.name = "category";
+    radioInputElement.value = category;
+    radioInputElement.id = `category-${category}`;
+    radioInputElement.addEventListener("change", () => {
+      selectedCategory = category;
+    });
+
+    const labelElement: HTMLLabelElement = document.createElement("label");
+    labelElement.setAttribute("for", `category-${category}`);
+    labelElement.innerText = category;
+
+    categoryElement.appendChild(radioInputElement);
+
+    categoriesContainerElement.appendChild(categoryElement);
+    categoryElement.appendChild(labelElement);
+  });
+};
+
 const addTask = (task: Task) => {
   tasks.push(task);
 };
 
 addButtonElement.addEventListener("click", (e: Event) => {
   e.preventDefault();
-  addTask({ name: taskNameInputElement.value, done: false });
+  addTask({
+    name: taskNameInputElement.value,
+    done: false,
+    category: selectedCategory,
+  });
   render();
 });
 
 addTask({ name: "zrobić", category: "gym", done: false });
+renderCategories();
 render();
